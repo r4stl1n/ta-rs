@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::errors::*;
 use crate::NumberType;
 use crate::{lit, Close, High, Low, Open, Volume};
@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Candle {
-    time: NaiveDateTime,
+    time: DateTime<Utc>,
     open: NumberType,
     high: NumberType,
     low: NumberType,
@@ -79,7 +79,7 @@ impl Volume for Candle {
 
 #[derive(Default)]
 pub struct CandleBuilder {
-    time: Option<NaiveDateTime>,
+    time: Option<DateTime<Utc>>,
     open: Option<NumberType>,
     high: Option<NumberType>,
     low: Option<NumberType>,
@@ -92,7 +92,7 @@ impl CandleBuilder {
         Self::default()
     }
 
-    pub fn time(mut self, time: NaiveDateTime) -> Self {
+    pub fn time(mut self, time: DateTime<Utc>) -> Self {
         self.time = Some(time);
         self
     }
