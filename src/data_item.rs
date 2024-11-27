@@ -92,6 +92,11 @@ impl CandleBuilder {
         Self::default()
     }
 
+    pub fn time(mut self, time: NaiveDateTime) -> Self {
+        self.time = Some(time);
+        self
+    }
+
     pub fn open(mut self, val: NumberType) -> Self {
         self.open = Some(val);
         self
