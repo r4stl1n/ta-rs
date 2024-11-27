@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use crate::errors::*;
 use crate::NumberType;
 use crate::{lit, Close, High, Low, Open, Volume};
@@ -32,6 +33,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct DataItem {
+    time: NaiveDateTime,
     open: NumberType,
     high: NumberType,
     low: NumberType,
@@ -77,6 +79,7 @@ impl Volume for DataItem {
 
 #[derive(Default)]
 pub struct DataItemBuilder {
+    time: Option<NaiveDateTime>,
     open: Option<NumberType>,
     high: Option<NumberType>,
     low: Option<NumberType>,
@@ -115,8 +118,8 @@ impl DataItemBuilder {
     }
 
     pub fn build(self) -> Result<DataItem> {
-        if let (Some(open), Some(high), Some(low), Some(close), Some(volume)) =
-            (self.open, self.high, self.low, self.close, self.volume)
+        if let (Some(time), Some(open), Some(high), Some(low), Some(close), Some(volume)) =
+            (self.time, self.open, self.high, self.low, self.close, self.volume)
         {
             // validate
             if low <= open
@@ -127,6 +130,7 @@ impl DataItemBuilder {
                 && volume >= lit!(0.0)
             {
                 let item = DataItem {
+                    time,
                     open,
                     high,
                     low,

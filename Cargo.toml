@@ -21,6 +21,7 @@ include = [
 travis-ci = { repository = "greyblake/ta-rs", branch = "master" }
 
 [dependencies]
+chrono = { version = "0.4.38" }
 serde = { version = "1.0", features = ["derive"], optional = true }
 rust_decimal = { version = "^1.25.0", optional = true, features = ["maths", "rand"] }
 
