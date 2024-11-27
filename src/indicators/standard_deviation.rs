@@ -1,8 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{int, lit, Close, Next, NumberType, Period, Reset};
-#[cfg(feature = "decimal")]
+use crate::{int, lit, Close, Next, Period, Reset};
 use rust_decimal::MathematicalOps;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -25,21 +24,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0)
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::StandardDeviation;
-/// use ta::Next;
-///
-/// let mut sd = StandardDeviation::new(3).unwrap();
-/// assert_eq!(sd.next(10.0), 0.0);
-/// assert_eq!(sd.next(20.0), 5.0);
-/// ```
-///
-/// # Links
-///
-/// * [Standard Deviation, Wikipedia](https://en.wikipedia.org/wiki/Standard_deviation)
-///
 #[doc(alias = "SD")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -47,12 +31,15 @@ pub struct StandardDeviation {
     period: usize,
     index: usize,
     count: usize,
-    m: NumberType,
-    m2: NumberType,
-    deque: Box<[NumberType]>,
+    m: rust_decimal::Decimal,
+    m2: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl StandardDeviation {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -67,7 +54,7 @@ impl StandardDeviation {
         }
     }
 
-    pub(super) fn mean(&self) -> NumberType {
+    pub(super) fn mean(&self) -> rust_decimal::Decimal {
         self.m
     }
 }
@@ -78,10 +65,10 @@ impl Period for StandardDeviation {
     }
 }
 
-impl Next<NumberType> for StandardDeviation {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for StandardDeviation {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let old_val = self.deque[self.index];
         self.deque[self.index] = input;
 
@@ -108,17 +95,14 @@ impl Next<NumberType> for StandardDeviation {
             self.m2 = lit!(0.0);
         }
 
-        #[cfg(not(feature = "decimal"))]
-        return (self.m2 / int!(self.count)).sqrt();
-        #[cfg(feature = "decimal")]
-        return (self.m2 / int!(self.count))
+        (self.m2 / int!(self.count))
             .sqrt()
-            .expect("Invalid (probably negative) number sent.");
+            .expect("Invalid (probably negative) number sent.")
     }
 }
 
 impl<T: Close> Next<&T> for StandardDeviation {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())
@@ -187,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(close: NumberType) -> Bar {
+        fn bar(close: rust_decimal::Decimal) -> Bar {
             Bar::new().close(close)
         }
 

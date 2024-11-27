@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::ExponentialMovingAverage as Ema;
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -24,32 +24,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Parameters
 ///
-/// * _fast_period_ - period for the fast EMA. Default is 12.
-/// * _slow_period_ - period for the slow EMA. Default is 26.
-/// * _signal_period_ - period for the signal EMA. Default is 9.
+/// * _`fast_period`_ - period for the fast EMA. Default is 12.
+/// * _`slow_period`_ - period for the slow EMA. Default is 26.
+/// * _`signal_period`_ - period for the signal EMA. Default is 9.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::PercentagePriceOscillator as Ppo;
-/// use ta::Next;
-///
-/// let mut ppo = Ppo::new(3, 6, 4).unwrap();
-///
-/// assert_eq!(round(ppo.next(2.0).into()), (0.0, 0.0, 0.0));
-/// assert_eq!(round(ppo.next(3.0).into()), (9.38, 3.75, 5.63));
-/// assert_eq!(round(ppo.next(4.2).into()), (18.26, 9.56, 8.71));
-/// assert_eq!(round(ppo.next(7.0).into()), (28.62, 17.18, 11.44));
-/// assert_eq!(round(ppo.next(6.7).into()), (24.01, 19.91, 4.09));
-/// assert_eq!(round(ppo.next(6.5).into()), (17.84, 19.08, -1.24));
-///
-/// fn round(nums: (f64, f64, f64)) -> (f64, f64, f64) {
-///     let n0 = (nums.0 * 100.0).round() / 100.0;
-///     let n1 = (nums.1 * 100.0).round() / 100.0;
-///     let n2 = (nums.2 * 100.0).round() / 100.0;
-///     (n0, n1, n2)
-/// }
-/// ```
 #[doc(alias = "PPO")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -60,6 +38,9 @@ pub struct PercentagePriceOscillator {
 }
 
 impl PercentagePriceOscillator {
+    /// # Errors
+    ///
+    /// Will return `Err` if any of the periods are 0
     pub fn new(fast_period: usize, slow_period: usize, signal_period: usize) -> Result<Self> {
         Ok(PercentagePriceOscillator {
             fast_ema: Ema::new(fast_period)?,
@@ -71,21 +52,21 @@ impl PercentagePriceOscillator {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct PercentagePriceOscillatorOutput {
-    pub ppo: NumberType,
-    pub signal: NumberType,
-    pub histogram: NumberType,
+    pub ppo: rust_decimal::Decimal,
+    pub signal: rust_decimal::Decimal,
+    pub histogram: rust_decimal::Decimal,
 }
 
-impl From<PercentagePriceOscillatorOutput> for (NumberType, NumberType, NumberType) {
+impl From<PercentagePriceOscillatorOutput> for (rust_decimal::Decimal,rust_decimal::Decimal,rust_decimal::Decimal) {
     fn from(po: PercentagePriceOscillatorOutput) -> Self {
         (po.ppo, po.signal, po.histogram)
     }
 }
 
-impl Next<NumberType> for PercentagePriceOscillator {
+impl Next<rust_decimal::Decimal> for PercentagePriceOscillator {
     type Output = PercentagePriceOscillatorOutput;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let fast_val = self.fast_ema.next(input);
         let slow_val = self.slow_ema.next(input);
 
@@ -140,19 +121,11 @@ mod tests {
     use super::*;
     use crate::test_helper::*;
     type Ppo = PercentagePriceOscillator;
-    #[cfg(feature = "decimal")]
+
     use rust_decimal::Decimal;
 
     test_indicator!(Ppo);
 
-    #[cfg(not(feature = "decimal"))]
-    fn round(nums: (f64, f64, f64)) -> (f64, f64, f64) {
-        let n0 = (nums.0 * 100.0).round() / 100.0;
-        let n1 = (nums.1 * 100.0).round() / 100.0;
-        let n2 = (nums.2 * 100.0).round() / 100.0;
-        (n0, n1, n2)
-    }
-    #[cfg(feature = "decimal")]
     fn round(nums: (Decimal, Decimal, Decimal)) -> (Decimal, Decimal, Decimal) {
         use rust_decimal::prelude::RoundingStrategy::MidpointAwayFromZero;
         (

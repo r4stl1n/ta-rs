@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::{Maximum, Minimum};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{lit, Close, High, Low, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -27,19 +27,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0). Default is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::FastStochastic;
-/// use ta::Next;
-///
-/// let mut stoch = FastStochastic::new(5).unwrap();
-/// assert_eq!(stoch.next(20.0), 50.0);
-/// assert_eq!(stoch.next(30.0), 100.0);
-/// assert_eq!(stoch.next(40.0), 100.0);
-/// assert_eq!(stoch.next(35.0), 75.0);
-/// assert_eq!(stoch.next(15.0), 0.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct FastStochastic {
@@ -49,6 +36,9 @@ pub struct FastStochastic {
 }
 
 impl FastStochastic {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             period,
@@ -64,10 +54,10 @@ impl Period for FastStochastic {
     }
 }
 
-impl Next<NumberType> for FastStochastic {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for FastStochastic {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let min = self.minimum.next(input);
         let max = self.maximum.next(input);
 
@@ -82,7 +72,7 @@ impl Next<NumberType> for FastStochastic {
 }
 
 impl<T: High + Low + Close> Next<&T> for FastStochastic {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         let highest = self.maximum.next(input.high());

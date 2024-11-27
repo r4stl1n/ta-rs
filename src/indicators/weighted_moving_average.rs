@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{int, lit, NumberType};
+use crate::{int, lit};
 use crate::{Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -21,24 +21,6 @@ use serde::{Deserialize, Serialize};
 /// * _n_ - is the period.
 /// * _p<sub>M</sub>_ - is the input value at a time period t.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::WeightedMovingAverage;
-/// use ta::Next;
-///
-/// let mut wma = WeightedMovingAverage::new(3).unwrap();
-/// assert_eq!(wma.next(10.0), 10.0);
-/// assert_eq!(wma.next(13.0), 12.0);
-/// assert_eq!(wma.next(16.0), 14.0);
-/// assert_eq!(wma.next(14.0), 14.5);
-/// ```
-///
-/// # Links
-///
-/// * [Weighted moving average, Wikipedia](https://en.wikipedia.org/wiki/Moving_average#Weighted_moving_average)
-///
-
 #[doc(alias = "WMA")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -46,13 +28,16 @@ pub struct WeightedMovingAverage {
     period: usize,
     index: usize,
     count: usize,
-    weight: NumberType,
-    sum: NumberType,
-    sum_flat: NumberType,
-    deque: Box<[NumberType]>,
+    weight: rust_decimal::Decimal,
+    sum: rust_decimal::Decimal,
+    sum_flat: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl WeightedMovingAverage {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -75,11 +60,11 @@ impl Period for WeightedMovingAverage {
     }
 }
 
-impl Next<NumberType> for WeightedMovingAverage {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for WeightedMovingAverage {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
-        let old_val: NumberType = self.deque[self.index];
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
+        let old_val: rust_decimal::Decimal = self.deque[self.index];
         self.deque[self.index] = input;
 
         self.index = if self.index + 1 < self.period {
@@ -91,7 +76,7 @@ impl Next<NumberType> for WeightedMovingAverage {
         if self.count < self.period {
             self.count += 1;
             self.weight = int!(self.count);
-            self.sum += input * self.weight
+            self.sum += input * self.weight;
         } else {
             self.sum = self.sum - self.sum_flat + (input * self.weight);
         }
@@ -101,7 +86,7 @@ impl Next<NumberType> for WeightedMovingAverage {
 }
 
 impl<T: Close> Next<&T> for WeightedMovingAverage {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())

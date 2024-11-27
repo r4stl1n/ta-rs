@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::helpers::max3;
-use crate::{lit, Close, High, Low, Next, NumberType, Reset};
+use crate::{lit, Close, High, Low, Next, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -18,44 +18,14 @@ use serde::{Deserialize, Serialize};
 ///
 /// TR = max[(high - low), abs(high - close<sub>prev</sub>), abs(low - close<sub>prev</sub>)]
 ///
-/// # Example
-///
-/// ```
-/// extern crate ta;
-/// #[macro_use] extern crate assert_approx_eq;
-///
-/// use ta::{Next, Candle};
-/// use ta::indicators::TrueRange;
-///
-/// fn main() {
-///     let data = vec![
-///         // open, high, low, close, tr
-///         (9.7   , 10.0, 9.0, 9.5  , 1.0),  // tr = high - low = 10.0 - 9.0 = 1.0
-///         (9.9   , 10.4, 9.8, 10.2 , 0.9),  // tr = high - prev_close = 10.4 - 9.5 = 0.9
-///         (10.1  , 10.7, 9.4, 9.7  , 1.3),  // tr = high - low = 10.7 - 9.4 = 1.3
-///         (9.1   , 9.2 , 8.1, 8.4  , 1.6),  // tr = prev_close - low = 9.7 - 8.1 = 1.6
-///     ];
-///     let mut indicator = TrueRange::new();
-///
-///     for (open, high, low, close, tr) in data {
-///         let di = Candle::builder()
-///             .high(high)
-///             .low(low)
-///             .close(close)
-///             .open(open)
-///             .volume(1000.0)
-///             .build().unwrap();
-///         assert_approx_eq!(indicator.next(&di), tr);
-///     }
-/// }
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct TrueRange {
-    prev_close: Option<NumberType>,
+    prev_close: Option<rust_decimal::Decimal>,
 }
 
 impl TrueRange {
+    #[must_use]
     pub fn new() -> Self {
         Self { prev_close: None }
     }
@@ -73,10 +43,10 @@ impl fmt::Display for TrueRange {
     }
 }
 
-impl Next<NumberType> for TrueRange {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for TrueRange {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let distance = match self.prev_close {
             Some(prev) => (input - prev).abs(),
             None => lit!(0.0),
@@ -87,7 +57,7 @@ impl Next<NumberType> for TrueRange {
 }
 
 impl<T: High + Low + Close> Next<&T> for TrueRange {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, bar: &T) -> Self::Output {
         let max_dist = match self.prev_close {

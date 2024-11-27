@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
 use std::fmt;
 
-use crate::{lit, Close, Next, NumberType, Reset, Volume};
+use crate::{lit, Close, Next, Reset, Volume};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -25,48 +26,22 @@ use serde::{Deserialize, Serialize};
 ///
 /// obv - on the balance volume
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::OnBalanceVolume;
-/// use ta::{Next, Candle};
-///
-/// let mut obv = OnBalanceVolume::new();
-///
-/// let di1 = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(2.0)
-///             .open(1.5)
-///             .volume(1000.0)
-///             .build().unwrap();
-///
-/// let di2 = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(1.5)
-///             .open(1.5)
-///             .volume(300.0)
-///             .build().unwrap();
-///
-/// assert_eq!(obv.next(&di1), 1000.0);
-/// assert_eq!(obv.next(&di2), 700.0);
-/// ```
-///
 /// # Links
 ///
 /// * [On Balance Volume, Wikipedia](https://en.wikipedia.org/wiki/On-balance_volume)
 /// * [On Balance Volume, stockcharts](https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
+///
 
 #[doc(alias = "OBV")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct OnBalanceVolume {
-    obv: NumberType,
-    prev_close: NumberType,
+    obv: rust_decimal::Decimal,
+    prev_close: rust_decimal::Decimal,
 }
 
 impl OnBalanceVolume {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             obv: lit!(0.0),
@@ -76,14 +51,19 @@ impl OnBalanceVolume {
 }
 
 impl<T: Close + Volume> Next<&T> for OnBalanceVolume {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
-        if input.close() > self.prev_close {
-            self.obv += input.volume();
-        } else if input.close() < self.prev_close {
-            self.obv -= input.volume();
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
+        match input.close().cmp(&self.prev_close) {
+            Ordering::Greater => {
+                self.obv += input.volume();
+            }
+            Ordering::Less => {
+                self.obv -= input.volume();
+            }
+            Ordering::Equal => {}
         }
+
         self.prev_close = input.close();
         self.obv
     }

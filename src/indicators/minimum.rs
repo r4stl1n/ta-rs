@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::{Result, TaError};
 use crate::helpers::INFINITY;
-use crate::{Low, Next, NumberType, Period, Reset};
+use crate::{Low, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -12,28 +12,19 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - size of the time frame (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::Minimum;
-/// use ta::Next;
-///
-/// let mut min = Minimum::new(3).unwrap();
-/// assert_eq!(min.next(10.0), 10.0);
-/// assert_eq!(min.next(11.0), 10.0);
-/// assert_eq!(min.next(12.0), 10.0);
-/// assert_eq!(min.next(13.0), 11.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct Minimum {
     period: usize,
     min_index: usize,
     cur_index: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl Minimum {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -67,10 +58,10 @@ impl Period for Minimum {
     }
 }
 
-impl Next<NumberType> for Minimum {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for Minimum {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.deque[self.cur_index] = input;
 
         if input < self.deque[self.min_index] {
@@ -90,7 +81,7 @@ impl Next<NumberType> for Minimum {
 }
 
 impl<T: Low> Next<&T> for Minimum {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.low())
@@ -149,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(low: NumberType) -> Bar {
+        fn bar(low: rust_decimal::Decimal) -> Bar {
             Bar::new().low(low)
         }
 

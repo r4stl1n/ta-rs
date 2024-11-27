@@ -1,7 +1,8 @@
+use std::cmp::Ordering;
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset, Volume};
+use crate::{lit, Close, High, Low, Next, Period, Reset, Volume};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -32,27 +33,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods, integer greater than 0
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::MoneyFlowIndex;
-/// use ta::{Next, Candle};
-///
-/// let mut mfi = MoneyFlowIndex::new(3).unwrap();
-/// let di = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(2.0)
-///             .open(1.5)
-///             .volume(1000.0)
-///             .build().unwrap();
-/// mfi.next(&di);
-///
-/// ```
 /// # Links
 /// * [Money Flow Index, Wikipedia](https://en.wikipedia.org/wiki/Money_flow_index)
 /// * [Money Flow Index, stockcharts](https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi)
-
+///
 #[doc(alias = "MFI")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -60,13 +44,16 @@ pub struct MoneyFlowIndex {
     period: usize,
     index: usize,
     count: usize,
-    previous_typical_price: NumberType,
-    total_positive_money_flow: NumberType,
-    total_negative_money_flow: NumberType,
-    deque: Box<[NumberType]>,
+    previous_typical_price: rust_decimal::Decimal,
+    total_positive_money_flow: rust_decimal::Decimal,
+    total_negative_money_flow: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl MoneyFlowIndex {
+    /// # Errors
+    ///
+    /// Will return `Err` if period is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -90,9 +77,9 @@ impl Period for MoneyFlowIndex {
 }
 
 impl<T: High + Low + Close + Volume> Next<&T> for MoneyFlowIndex {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
         let tp = (input.close() + input.high() + input.low()) / lit!(3.0);
 
         self.index = if self.index + 1 < self.period {
@@ -116,17 +103,23 @@ impl<T: High + Low + Close + Volume> Next<&T> for MoneyFlowIndex {
             }
         }
 
-        if tp > self.previous_typical_price {
-            let raw_money_flow = tp * input.volume();
-            self.total_positive_money_flow += raw_money_flow;
-            self.deque[self.index] = raw_money_flow;
-        } else if tp < self.previous_typical_price {
-            let raw_money_flow = tp * input.volume();
-            self.total_negative_money_flow += raw_money_flow;
-            self.deque[self.index] = -raw_money_flow;
-        } else {
-            self.deque[self.index] = lit!(0.0);
+        match tp.cmp(&self.previous_typical_price) {
+            Ordering::Greater => {
+                let raw_money_flow = tp * input.volume();
+                self.total_positive_money_flow += raw_money_flow;
+                self.deque[self.index] = raw_money_flow;
+            }
+            Ordering::Less => {
+                let raw_money_flow = tp * input.volume();
+                self.total_negative_money_flow += raw_money_flow;
+                self.deque[self.index] = -raw_money_flow;
+            }
+            Ordering::Equal => {
+                self.deque[self.index] = lit!(0.0);
+            }
+
         }
+
         self.previous_typical_price = tp;
 
         self.total_positive_money_flow

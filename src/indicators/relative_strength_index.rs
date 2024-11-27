@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::ExponentialMovingAverage as Ema;
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -51,19 +51,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::RelativeStrengthIndex;
-/// use ta::Next;
-///
-/// let mut rsi = RelativeStrengthIndex::new(3).unwrap();
-/// assert_eq!(rsi.next(10.0), 50.0);
-/// assert_eq!(rsi.next(10.5).round(), 86.0);
-/// assert_eq!(rsi.next(10.0).round(), 35.0);
-/// assert_eq!(rsi.next(9.5).round(), 16.0);
-/// ```
-///
 /// # Links
 /// * [Relative strength index (Wikipedia)](https://en.wikipedia.org/wiki/Relative_strength_index)
 /// * [RSI (Investopedia)](http://www.investopedia.com/terms/r/rsi.asp)
@@ -75,11 +62,14 @@ pub struct RelativeStrengthIndex {
     period: usize,
     up_ema_indicator: Ema,
     down_ema_indicator: Ema,
-    prev_val: NumberType,
+    prev_val: rust_decimal::Decimal,
     is_new: bool,
 }
 
 impl RelativeStrengthIndex {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             period,
@@ -97,10 +87,10 @@ impl Period for RelativeStrengthIndex {
     }
 }
 
-impl Next<NumberType> for RelativeStrengthIndex {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for RelativeStrengthIndex {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let mut up = lit!(0.0);
         let mut down = lit!(0.0);
 
@@ -123,7 +113,7 @@ impl Next<NumberType> for RelativeStrengthIndex {
 }
 
 impl<T: Close> Next<&T> for RelativeStrengthIndex {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())

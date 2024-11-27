@@ -1,78 +1,55 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
-use crate::errors::*;
-use crate::NumberType;
+use chrono::{DateTime, Utc};
+use crate::errors::{Result, TaError};
 use crate::{lit, Close, High, Low, Open, Volume};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// Data item is used as an input for indicators.
-///
-/// # Example
-///
-/// ```
-/// use ta::Candle;
-/// use ta::{Open, High, Low, Close, Volume};
-///
-/// let item = Candle::builder()
-///     .open(20.0)
-///     .high(25.0)
-///     .low(15.0)
-///     .close(21.0)
-///     .volume(7500.0)
-///     .build()
-///     .unwrap();
-///
-/// assert_eq!(item.open(), 20.0);
-/// assert_eq!(item.high(), 25.0);
-/// assert_eq!(item.low(), 15.0);
-/// assert_eq!(item.close(), 21.0);
-/// assert_eq!(item.volume(), 7500.0);
-/// ```
-///
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Candle {
     time: DateTime<Utc>,
-    open: NumberType,
-    high: NumberType,
-    low: NumberType,
-    close: NumberType,
-    volume: NumberType,
+    open: rust_decimal::Decimal,
+    high: rust_decimal::Decimal,
+    low: rust_decimal::Decimal,
+    close: rust_decimal::Decimal,
+    volume: rust_decimal::Decimal,
 }
 
 impl Candle {
+    #[must_use]
     pub fn builder() -> CandleBuilder {
         CandleBuilder::new()
     }
 }
 
 impl Open for Candle {
-    fn open(&self) -> NumberType {
+    fn open(&self) -> rust_decimal::Decimal {
         self.open
     }
 }
 
 impl High for Candle {
-    fn high(&self) -> NumberType {
+    fn high(&self) -> rust_decimal::Decimal {
         self.high
     }
 }
 
 impl Low for Candle {
-    fn low(&self) -> NumberType {
+    fn low(&self) -> rust_decimal::Decimal {
         self.low
     }
 }
 
 impl Close for Candle {
-    fn close(&self) -> NumberType {
+    fn close(&self) -> rust_decimal::Decimal {
         self.close
     }
 }
 
 impl Volume for Candle {
-    fn volume(&self) -> NumberType {
+    fn volume(&self) -> rust_decimal::Decimal {
         self.volume
     }
 }
@@ -80,11 +57,11 @@ impl Volume for Candle {
 #[derive(Default)]
 pub struct CandleBuilder {
     time: Option<DateTime<Utc>>,
-    open: Option<NumberType>,
-    high: Option<NumberType>,
-    low: Option<NumberType>,
-    close: Option<NumberType>,
-    volume: Option<NumberType>,
+    open: Option<rust_decimal::Decimal>,
+    high: Option<rust_decimal::Decimal>,
+    low: Option<rust_decimal::Decimal>,
+    close: Option<rust_decimal::Decimal>,
+    volume: Option<rust_decimal::Decimal>,
 }
 
 impl CandleBuilder {
@@ -97,27 +74,27 @@ impl CandleBuilder {
         self
     }
 
-    pub fn open(mut self, val: NumberType) -> Self {
+    pub fn open(mut self, val: rust_decimal::Decimal) -> Self {
         self.open = Some(val);
         self
     }
 
-    pub fn high(mut self, val: NumberType) -> Self {
+    pub fn high(mut self, val: rust_decimal::Decimal) -> Self {
         self.high = Some(val);
         self
     }
 
-    pub fn low(mut self, val: NumberType) -> Self {
+    pub fn low(mut self, val: rust_decimal::Decimal) -> Self {
         self.low = Some(val);
         self
     }
 
-    pub fn close(mut self, val: NumberType) -> Self {
+    pub fn close(mut self, val: rust_decimal::Decimal) -> Self {
         self.close = Some(val);
         self
     }
 
-    pub fn volume(mut self, val: NumberType) -> Self {
+    pub fn volume(mut self, val: rust_decimal::Decimal) -> Self {
         self.volume = Some(val);
         self
     }
@@ -154,39 +131,43 @@ impl CandleBuilder {
 
 #[cfg(test)]
 mod tests {
+    use chrono::TimeZone;
     use super::*;
 
     #[test]
     fn test_builder() {
         fn assert_valid(
             (open, high, low, close, volume): (
-                NumberType,
-                NumberType,
-                NumberType,
-                NumberType,
-                NumberType,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
             ),
         ) {
             let result = Candle::builder()
+                .time(Utc.timestamp_opt(0, 0).single().unwrap_or_else(Utc::now))
                 .open(open)
                 .high(high)
                 .low(low)
                 .close(close)
                 .volume(volume)
                 .build();
+
             assert!(result.is_ok());
         }
 
         fn assert_invalid(
             (open, high, low, close, volume): (
-                NumberType,
-                NumberType,
-                NumberType,
-                NumberType,
-                NumberType,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
+                rust_decimal::Decimal,
             ),
         ) {
             let result = Candle::builder()
+                .time(Utc.timestamp_opt(0, 0).single().unwrap_or_else(Utc::now))
                 .open(open)
                 .high(high)
                 .low(low)

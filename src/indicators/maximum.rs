@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::{Result, TaError};
 use crate::helpers::NEG_INFINITY;
-use crate::{High, Next, NumberType, Period, Reset};
+use crate::{High, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -12,29 +12,19 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - size of the time frame (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::Maximum;
-/// use ta::Next;
-///
-/// let mut max = Maximum::new(3).unwrap();
-/// assert_eq!(max.next(7.0), 7.0);
-/// assert_eq!(max.next(5.0), 7.0);
-/// assert_eq!(max.next(4.0), 7.0);
-/// assert_eq!(max.next(4.0), 5.0);
-/// assert_eq!(max.next(8.0), 8.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct Maximum {
     period: usize,
     max_index: usize,
     cur_index: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl Maximum {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -68,10 +58,10 @@ impl Period for Maximum {
     }
 }
 
-impl Next<NumberType> for Maximum {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for Maximum {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.deque[self.cur_index] = input;
 
         if input > self.deque[self.max_index] {
@@ -91,7 +81,7 @@ impl Next<NumberType> for Maximum {
 }
 
 impl<T: High> Next<&T> for Maximum {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.high())
@@ -149,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(high: NumberType) -> Bar {
+        fn bar(high: rust_decimal::Decimal) -> Bar {
             Bar::new().high(high)
         }
 

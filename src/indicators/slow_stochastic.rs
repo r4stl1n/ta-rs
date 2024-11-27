@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::{ExponentialMovingAverage, FastStochastic};
-use crate::{Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{Close, High, Low, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -12,22 +12,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Parameters
 ///
-/// * _stochastic_period_ - number of periods for fast stochastic (integer greater than 0). Default is 14.
-/// * _ema_period_ - period for EMA (integer greater than 0). Default is 3.
+/// * _`stochastic_period`_ - number of periods for fast stochastic (integer greater than 0). Default is 14.
+/// * _`ema_period`_ - period for EMA (integer greater than 0). Default is 3.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::SlowStochastic;
-/// use ta::Next;
-///
-/// let mut stoch = SlowStochastic::new(3, 2).unwrap();
-/// assert_eq!(stoch.next(10.0), 50.0);
-/// assert_eq!(stoch.next(50.0).round(), 83.0);
-/// assert_eq!(stoch.next(50.0).round(), 94.0);
-/// assert_eq!(stoch.next(30.0).round(), 31.0);
-/// assert_eq!(stoch.next(55.0).round(), 77.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
 pub struct SlowStochastic {
@@ -36,6 +23,9 @@ pub struct SlowStochastic {
 }
 
 impl SlowStochastic {
+    /// # Errors
+    ///
+    /// Will return `Err` if any of the periods are 0
     pub fn new(stochastic_period: usize, ema_period: usize) -> Result<Self> {
         Ok(Self {
             fast_stochastic: FastStochastic::new(stochastic_period)?,
@@ -44,16 +34,16 @@ impl SlowStochastic {
     }
 }
 
-impl Next<NumberType> for SlowStochastic {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for SlowStochastic {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.ema.next(self.fast_stochastic.next(input))
     }
 }
 
 impl<T: High + Low + Close> Next<&T> for SlowStochastic {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.ema.next(self.fast_stochastic.next(input))

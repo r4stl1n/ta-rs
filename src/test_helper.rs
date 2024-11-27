@@ -1,12 +1,12 @@
-use super::{lit, Close, High, Low, NumberType, Open, Volume};
+use super::{lit, Close, High, Low, Open, Volume};
 
 #[derive(Debug, PartialEq)]
 pub struct Bar {
-    open: NumberType,
-    high: NumberType,
-    low: NumberType,
-    close: NumberType,
-    volume: NumberType,
+    open: rust_decimal::Decimal,
+    high: rust_decimal::Decimal,
+    low: rust_decimal::Decimal,
+    close: rust_decimal::Decimal,
+    volume: rust_decimal::Decimal,
 }
 
 impl Bar {
@@ -20,69 +20,63 @@ impl Bar {
         }
     }
 
-    //pub fn open<T: Into<NumberType>>(mut self, val :T ) -> Self {
+    //pub fn open<T: Into<rust_decimal::Decimal>>(mut self, val :T ) -> Self {
     //    self.open = val.into();
     //    self
     //}
 
-    pub fn high<T: Into<NumberType>>(mut self, val: T) -> Self {
+    pub fn high<T: Into<rust_decimal::Decimal>>(mut self, val: T) -> Self {
         self.high = val.into();
         self
     }
 
-    pub fn low<T: Into<NumberType>>(mut self, val: T) -> Self {
+    pub fn low<T: Into<rust_decimal::Decimal>>(mut self, val: T) -> Self {
         self.low = val.into();
         self
     }
 
-    pub fn close<T: Into<NumberType>>(mut self, val: T) -> Self {
+    pub fn close<T: Into<rust_decimal::Decimal>>(mut self, val: T) -> Self {
         self.close = val.into();
         self
     }
 
-    pub fn volume<T: Into<NumberType>>(mut self, val: T) -> Self {
+    pub fn volume<T: Into<rust_decimal::Decimal>>(mut self, val: T) -> Self {
         self.volume = val.into();
         self
     }
 }
 
 impl Open for Bar {
-    fn open(&self) -> NumberType {
+    fn open(&self) -> rust_decimal::Decimal {
         self.open
     }
 }
 
 impl Close for Bar {
-    fn close(&self) -> NumberType {
+    fn close(&self) -> rust_decimal::Decimal {
         self.close
     }
 }
 
 impl Low for Bar {
-    fn low(&self) -> NumberType {
+    fn low(&self) -> rust_decimal::Decimal {
         self.low
     }
 }
 
 impl High for Bar {
-    fn high(&self) -> NumberType {
+    fn high(&self) -> rust_decimal::Decimal {
         self.high
     }
 }
 
 impl Volume for Bar {
-    fn volume(&self) -> NumberType {
+    fn volume(&self) -> rust_decimal::Decimal {
         self.volume
     }
 }
 
-#[cfg(not(feature = "decimal"))]
-pub fn round(num: NumberType) -> NumberType {
-    (num * 1000.0).round() / 1000.00
-}
-
-#[cfg(feature = "decimal")]
-pub fn round(num: NumberType) -> NumberType {
+pub fn round(num: rust_decimal::Decimal) -> rust_decimal::Decimal {
     use rust_decimal::prelude::RoundingStrategy;
     num.round_dp_with_strategy(3, RoundingStrategy::MidpointAwayFromZero)
 }
@@ -97,7 +91,7 @@ macro_rules! test_indicator {
             // ensure Default trait is implemented
             let mut indicator = $i::default();
 
-            // ensure Next<NumberType> is implemented
+            // ensure Next<rust_decimal::Decimal> is implemented
             let first_output = indicator.next(lit!(12.3));
 
             // ensure next accepts &DataItem as well
@@ -108,7 +102,7 @@ macro_rules! test_indicator {
             assert_eq!(indicator.next(lit!(12.3)), first_output);
 
             // ensure Display is implemented
-            format!("{}", indicator);
+            let _ = format!("{}", indicator);
         }
     };
 }

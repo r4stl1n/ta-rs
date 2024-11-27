@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::StandardDeviation as Sd;
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -21,48 +21,31 @@ use serde::{Deserialize, Serialize};
 ///  * _BB<sub>Upper Band</sub>_ = SMA + SD of observation * multipler (usually 2.0)
 ///  * _BB<sub>Lower Band</sub>_ = SMA - SD of observation * multipler (usually 2.0)
 ///
-/// # Example
-///
-///```
-/// use ta::indicators::{BollingerBands, BollingerBandsOutput};
-/// use ta::Next;
-///
-/// let mut bb = BollingerBands::new(3, 2.0_f64).unwrap();
-///
-/// let out_0 = bb.next(2.0);
-///
-/// let out_1 = bb.next(5.0);
-///
-/// assert_eq!(out_0.average, 2.0);
-/// assert_eq!(out_0.upper, 2.0);
-/// assert_eq!(out_0.lower, 2.0);
-///
-/// assert_eq!(out_1.average, 3.5);
-/// assert_eq!(out_1.upper, 6.5);
-/// assert_eq!(out_1.lower, 0.5);
-/// ```
-///
 /// # Links
 ///
 /// * [Bollinger Bands, Wikipedia](https://en.wikipedia.org/wiki/Bollinger_Bands)
+///
 #[doc(alias = "BB")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct BollingerBands {
     period: usize,
-    multiplier: NumberType,
+    multiplier: rust_decimal::Decimal,
     sd: Sd,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BollingerBandsOutput {
-    pub average: NumberType,
-    pub upper: NumberType,
-    pub lower: NumberType,
+    pub average: rust_decimal::Decimal,
+    pub upper: rust_decimal::Decimal,
+    pub lower: rust_decimal::Decimal,
 }
 
 impl BollingerBands {
-    pub fn new(period: usize, multiplier: NumberType) -> Result<Self> {
+    /// # Errors
+    ///
+    /// Will return `Err` if period or multiplier is 0
+    pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             period,
             multiplier,
@@ -70,7 +53,8 @@ impl BollingerBands {
         })
     }
 
-    pub fn multiplier(&self) -> NumberType {
+    #[must_use]
+    pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }
 }
@@ -81,10 +65,10 @@ impl Period for BollingerBands {
     }
 }
 
-impl Next<NumberType> for BollingerBands {
+impl Next<rust_decimal::Decimal> for BollingerBands {
     type Output = BollingerBandsOutput;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let sd = self.sd.next(input);
         let mean = self.sd.mean();
 

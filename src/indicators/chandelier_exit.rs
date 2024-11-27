@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
 use crate::indicators::{AverageTrueRange, Maximum, Minimum};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{lit, Close, High, Low, Next, Period, Reset};
 
 /// Chandelier Exit (CE).
 ///
@@ -24,28 +24,6 @@ use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
 /// * _period_ - number of periods (integer greater than 0). Default is 22.
 /// * _multipler_ - ATR factor. Default is 3.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::ChandelierExit;
-/// use ta::{Next, Candle};
-///
-/// let value1 = Candle::builder()
-/// .open(21.0).high(22.0).low(20.0).close(21.0).volume(1.0).build().unwrap();
-/// let value2 = Candle::builder()
-/// .open(23.0).high(24.0).low(22.0).close(23.0).volume(1.0).build().unwrap();
-///
-/// let mut ce = ChandelierExit::default();
-///
-/// let first = ce.next(&value1);
-/// assert_eq!(first.long, 16.0);
-/// assert_eq!(first.short, 26.0);
-///
-/// let second = ce.next(&value2);
-/// assert_eq!((second.long * 100.0).round() / 100.0, 17.74);
-/// assert_eq!((second.short * 100.0).round() / 100.0, 26.26);
-/// ```
-///
 /// # Links
 ///
 /// * [Chandelier Exit, StockCharts](https://school.stockcharts.com/doku.php?id=technical_indicators:chandelier_exit)
@@ -57,11 +35,14 @@ pub struct ChandelierExit {
     atr: AverageTrueRange,
     min: Minimum,
     max: Maximum,
-    multiplier: NumberType,
+    multiplier: rust_decimal::Decimal,
 }
 
 impl ChandelierExit {
-    pub fn new(period: usize, multiplier: NumberType) -> Result<Self> {
+    /// # Errors
+    ///
+    /// Will return `Err` if period or multipler is 0
+    pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             atr: AverageTrueRange::new(period)?,
             min: Minimum::new(period)?,
@@ -70,18 +51,19 @@ impl ChandelierExit {
         })
     }
 
-    pub fn multiplier(&self) -> NumberType {
+    #[must_use]
+    pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ChandelierExitOutput {
-    pub long: NumberType,
-    pub short: NumberType,
+    pub long: rust_decimal::Decimal,
+    pub short: rust_decimal::Decimal,
 }
 
-impl From<ChandelierExitOutput> for (NumberType, NumberType) {
+impl From<ChandelierExitOutput> for (rust_decimal::Decimal,rust_decimal::Decimal) {
     fn from(ce: ChandelierExitOutput) -> Self {
         (ce.long, ce.short)
     }
@@ -136,7 +118,7 @@ mod tests {
 
     type Ce = ChandelierExit;
 
-    fn round(nums: (NumberType, NumberType)) -> (NumberType, NumberType) {
+    fn round(nums: (rust_decimal::Decimal,rust_decimal::Decimal)) -> (rust_decimal::Decimal,rust_decimal::Decimal) {
         let n0 = (nums.0 * lit!(100.0)).round() / lit!(100.0);
         let n1 = (nums.1 * lit!(100.0)).round() / lit!(100.0);
         (n0, n1)

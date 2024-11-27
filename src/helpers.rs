@@ -1,64 +1,22 @@
-#[cfg(not(feature = "decimal"))]
-mod generics {
-    pub(crate) type NumberType = f64;
+use rust_decimal::Decimal;
+pub const INFINITY: Decimal = Decimal::MAX;
+pub const NEG_INFINITY: Decimal = Decimal::MIN;
 
-    #[macro_export]
-    macro_rules! lit {
-        ($e:expr) => {
-            $e
-        };
-    }
-
-    #[macro_export]
-    macro_rules! int {
-        ($e:expr) => {
-            $e as f64
-        };
-    }
-
-    pub use std::f64::INFINITY;
-    pub use std::f64::NEG_INFINITY;
-}
-
-#[cfg(feature = "decimal")]
-mod generics {
-    pub(crate) type NumberType = rust_decimal::Decimal;
-
-    #[macro_export]
-    macro_rules! lit {
+#[macro_export]
+macro_rules! lit {
         ($e:expr) => {
             ::rust_decimal::Decimal::from_str_exact(stringify!($e)).unwrap()
         };
     }
 
-    #[macro_export]
-    macro_rules! int {
+#[macro_export]
+macro_rules! int {
         ($e:expr) => {
             ::rust_decimal::Decimal::new($e.try_into().unwrap(), 0)
         };
     }
 
-    use rust_decimal::Decimal;
-    pub const INFINITY: Decimal = Decimal::MAX;
-    pub const NEG_INFINITY: Decimal = Decimal::MIN;
-}
-
-pub(crate) use generics::*;
-
 /// Returns the largest of 3 given numbers.
-pub fn max3(a: NumberType, b: NumberType, c: NumberType) -> NumberType {
+pub fn max3(a: rust_decimal::Decimal, b: rust_decimal::Decimal, c: rust_decimal::Decimal) -> rust_decimal::Decimal {
     a.max(b).max(c)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::lit;
-
-    #[test]
-    fn test_max3() {
-        assert_eq!(max3(lit!(3.0), lit!(2.0), lit!(1.0)), lit!(3.0));
-        assert_eq!(max3(lit!(2.0), lit!(3.0), lit!(1.0)), lit!(3.0));
-        assert_eq!(max3(lit!(2.0), lit!(1.0), lit!(3.0)), lit!(3.0));
-    }
 }

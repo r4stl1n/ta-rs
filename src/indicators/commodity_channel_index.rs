@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
 use crate::indicators::{MeanAbsoluteDeviation, SimpleMovingAverage};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{lit, Close, High, Low, Next, Period, Reset};
 
 /// Commodity Channel Index (CCI)
 ///
@@ -36,6 +36,9 @@ pub struct CommodityChannelIndex {
 }
 
 impl CommodityChannelIndex {
+    /// # Errors
+    ///
+    /// Will return `Err` if period is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             sma: SimpleMovingAverage::new(period)?,
@@ -51,7 +54,7 @@ impl Period for CommodityChannelIndex {
 }
 
 impl<T: Close + High + Low> Next<&T> for CommodityChannelIndex {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         let tp = (input.close() + input.high() + input.low()) / lit!(3.0);

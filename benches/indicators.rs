@@ -1,4 +1,5 @@
 use bencher::{benchmark_group, benchmark_main, black_box, Bencher};
+use chrono::{TimeZone, Utc};
 use rand::Rng;
 use ta::indicators::{
     AverageTrueRange, BollingerBands, ChandelierExit, CommodityChannelIndex, EfficiencyRatio,
@@ -21,6 +22,7 @@ fn rand_data_item() -> Candle {
     let volume = rng.gen_range(lit!(0.0)..=lit!(10_000.0));
 
     Candle::builder()
+        .time(Utc.timestamp_opt(0, 0).single().unwrap_or_else(Utc::now))
         .open(open)
         .high(high)
         .low(low)
