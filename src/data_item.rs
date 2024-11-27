@@ -58,7 +58,7 @@ impl Volume for Candle {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub struct CandleBuilder {
     time: Option<DateTime<Utc>>,
     open: Option<rust_decimal::Decimal>,
