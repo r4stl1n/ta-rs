@@ -1,24 +1,24 @@
-use bencher::{benchmark_group, benchmark_main, Bencher};
+use bencher::{benchmark_group, benchmark_main, black_box, Bencher};
 use rand::Rng;
 use ta::indicators::{
     AverageTrueRange, BollingerBands, ChandelierExit, CommodityChannelIndex, EfficiencyRatio,
     ExponentialMovingAverage, FastStochastic, KeltnerChannel, Maximum, MeanAbsoluteDeviation,
     Minimum, MoneyFlowIndex, MovingAverageConvergenceDivergence, OnBalanceVolume,
     PercentagePriceOscillator, RateOfChange, RelativeStrengthIndex, SimpleMovingAverage,
-    SlowStochastic, StandardDeviation, TrueRange,
+    SlowStochastic, StandardDeviation, TrueRange, WeightedMovingAverage,
 };
-use ta::{DataItem, Next};
+use ta::{lit, DataItem, Next};
 
 const ITEMS_COUNT: usize = 5_000;
 
 fn rand_data_item() -> DataItem {
     let mut rng = rand::thread_rng();
 
-    let low = rng.gen_range(0.0, 500.0);
-    let high = rng.gen_range(500.0, 1000.0);
-    let open = rng.gen_range(low, high);
-    let close = rng.gen_range(low, high);
-    let volume = rng.gen_range(0.0, 10_000.0);
+    let low = rng.gen_range(lit!(0.0)..=lit!(500.0));
+    let high = rng.gen_range(lit!(500.0)..=lit!(1000.0));
+    let open = rng.gen_range(low..=high);
+    let close = rng.gen_range(low..=high);
+    let volume = rng.gen_range(lit!(0.0)..=lit!(10_000.0));
 
     DataItem::builder()
         .open(open)
@@ -40,7 +40,7 @@ macro_rules! bench_indicators {
 
                 bench.iter(|| {
                     for item in items.iter() {
-                        indicator.next(item);
+                        black_box(indicator.next(item));
                     }
                 })
             }
@@ -72,5 +72,6 @@ bench_indicators!(
     SimpleMovingAverage,
     SlowStochastic,
     StandardDeviation,
-    TrueRange
+    TrueRange,
+    WeightedMovingAverage
 );

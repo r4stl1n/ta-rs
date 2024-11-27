@@ -29,6 +29,7 @@
 //! * Trend
 //!   * [Exponential Moving Average (EMA)](crate::indicators::ExponentialMovingAverage)
 //!   * [Simple Moving Average (SMA)](crate::indicators::SimpleMovingAverage)
+//!   * [Weighted Moving Average (WMA)](crate::indicators::WeightedMovingAverage)
 //! * Oscillators
 //!   * [Relative Strength Index (RSI)](indicators/struct.RelativeStrengthIndex.html)
 //!   * [Fast Stochastic](indicators/struct.FastStochastic.html)
@@ -51,11 +52,13 @@
 //!   * [Rate of Change (ROC)](indicators/struct.RateOfChange.html)
 //!   * [On Balance Volume (OBV)](indicators/struct.OnBalanceVolume.html)
 //!
+#[macro_use]
+mod helpers;
+pub(crate) use helpers::NumberType;
+
 #[cfg(test)]
 #[macro_use]
 mod test_helper;
-
-mod helpers;
 
 pub mod errors;
 pub mod indicators;
