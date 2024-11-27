@@ -102,7 +102,7 @@ macro_rules! test_indicator {
             assert_eq!(indicator.next(lit!(12.3)), first_output);
 
             // ensure Display is implemented
-            format!("{}", indicator);
+            let _ = format!("{}", indicator);
         }
     };
 }

@@ -11,7 +11,7 @@ pub trait Period {
 
 /// Consumes a data item of type `T` and returns `Output`.
 ///
-/// Typically `T` can be `f64` or a struct similar to [DataItem](struct.DataItem.html), that implements
+/// Typically `T` can be `f64` or a struct similar to [`DataItem`](struct.DataItem.html), that implements
 /// traits necessary to calculate value of a particular indicator.
 ///
 /// In most cases `Output` is `f64`, but sometimes it can be different. For example for

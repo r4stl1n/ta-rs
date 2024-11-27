@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 /// # Links
 ///
 /// * [Keltner channel, Wikipedia](https://en.wikipedia.org/wiki/Keltner_channel)
-/// 
+///
 #[doc(alias = "KC")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -44,6 +44,9 @@ pub struct KeltnerChannelOutput {
 }
 
 impl KeltnerChannel {
+    /// # Errors
+    ///
+    /// Will return `Err` if period or multiple is 0
     pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             period,
@@ -53,6 +56,7 @@ impl KeltnerChannel {
         })
     }
 
+    #[must_use]
     pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }

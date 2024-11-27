@@ -36,6 +36,9 @@ pub struct FastStochastic {
 }
 
 impl FastStochastic {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             period,

@@ -23,9 +23,7 @@ impl Display for TaError {
 impl Error for TaError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match *self {
-            TaError::InvalidParameter => None,
-            TaError::DataItemIncomplete => None,
-            TaError::DataItemInvalid => None,
+            TaError::DataItemInvalid | TaError::DataItemIncomplete | TaError::InvalidParameter => None,
         }
     }
 }

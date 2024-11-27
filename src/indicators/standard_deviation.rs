@@ -37,6 +37,9 @@ pub struct StandardDeviation {
 }
 
 impl StandardDeviation {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -92,9 +95,9 @@ impl Next<rust_decimal::Decimal> for StandardDeviation {
             self.m2 = lit!(0.0);
         }
 
-        return (self.m2 / int!(self.count))
+        (self.m2 / int!(self.count))
             .sqrt()
-            .expect("Invalid (probably negative) number sent.");
+            .expect("Invalid (probably negative) number sent.")
     }
 }
 

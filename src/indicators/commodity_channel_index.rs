@@ -36,6 +36,9 @@ pub struct CommodityChannelIndex {
 }
 
 impl CommodityChannelIndex {
+    /// # Errors
+    ///
+    /// Will return `Err` if period is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             sma: SimpleMovingAverage::new(period)?,

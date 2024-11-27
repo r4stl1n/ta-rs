@@ -25,6 +25,9 @@ pub struct EfficiencyRatio {
 }
 
 impl EfficiencyRatio {
+    /// # Errors
+    ///
+    /// Will return `Err` if any of the periods is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),

@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 
 use crate::errors::{Result, TaError};
@@ -50,6 +51,9 @@ pub struct MoneyFlowIndex {
 }
 
 impl MoneyFlowIndex {
+    /// # Errors
+    ///
+    /// Will return `Err` if period is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -99,17 +103,23 @@ impl<T: High + Low + Close + Volume> Next<&T> for MoneyFlowIndex {
             }
         }
 
-        if tp > self.previous_typical_price {
-            let raw_money_flow = tp * input.volume();
-            self.total_positive_money_flow += raw_money_flow;
-            self.deque[self.index] = raw_money_flow;
-        } else if tp < self.previous_typical_price {
-            let raw_money_flow = tp * input.volume();
-            self.total_negative_money_flow += raw_money_flow;
-            self.deque[self.index] = -raw_money_flow;
-        } else {
-            self.deque[self.index] = lit!(0.0);
+        match tp.cmp(&self.previous_typical_price) {
+            Ordering::Greater => {
+                let raw_money_flow = tp * input.volume();
+                self.total_positive_money_flow += raw_money_flow;
+                self.deque[self.index] = raw_money_flow;
+            }
+            Ordering::Less => {
+                let raw_money_flow = tp * input.volume();
+                self.total_negative_money_flow += raw_money_flow;
+                self.deque[self.index] = -raw_money_flow;
+            }
+            Ordering::Equal => {
+                self.deque[self.index] = lit!(0.0);
+            }
+
         }
+
         self.previous_typical_price = tp;
 
         self.total_positive_money_flow

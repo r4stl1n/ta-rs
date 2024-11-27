@@ -35,6 +35,9 @@ pub struct WeightedMovingAverage {
 }
 
 impl WeightedMovingAverage {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
@@ -73,7 +76,7 @@ impl Next<rust_decimal::Decimal> for WeightedMovingAverage {
         if self.count < self.period {
             self.count += 1;
             self.weight = int!(self.count);
-            self.sum += input * self.weight
+            self.sum += input * self.weight;
         } else {
             self.sum = self.sum - self.sum_flat + (input * self.weight);
         }

@@ -25,6 +25,7 @@ pub struct TrueRange {
 }
 
 impl TrueRange {
+    #[must_use]
     pub fn new() -> Self {
         Self { prev_close: None }
     }

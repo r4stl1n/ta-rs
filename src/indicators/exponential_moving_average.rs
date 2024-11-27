@@ -48,6 +48,9 @@ pub struct ExponentialMovingAverage {
 }
 
 impl ExponentialMovingAverage {
+    /// # Errors
+    ///
+    /// Will return `Err` if `period` is 0
     pub fn new(period: usize) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),

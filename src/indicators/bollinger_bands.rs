@@ -42,6 +42,9 @@ pub struct BollingerBandsOutput {
 }
 
 impl BollingerBands {
+    /// # Errors
+    ///
+    /// Will return `Err` if period or multiplier is 0
     pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             period,
@@ -50,6 +53,7 @@ impl BollingerBands {
         })
     }
 
+    #[must_use]
     pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }

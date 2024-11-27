@@ -24,9 +24,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Parameters
 ///
-/// * _fast_period_ - period for the fast EMA. Default is 12.
-/// * _slow_period_ - period for the slow EMA. Default is 26.
-/// * _signal_period_ - period for the signal EMA. Default is 9.
+/// * _`fast_period`_ - period for the fast EMA. Default is 12.
+/// * _`slow_period`_ - period for the slow EMA. Default is 26.
+/// * _`signal_period`_ - period for the signal EMA. Default is 9.
 ///
 #[doc(alias = "PPO")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -38,6 +38,9 @@ pub struct PercentagePriceOscillator {
 }
 
 impl PercentagePriceOscillator {
+    /// # Errors
+    ///
+    /// Will return `Err` if any of the periods are 0
     pub fn new(fast_period: usize, slow_period: usize, signal_period: usize) -> Result<Self> {
         Ok(PercentagePriceOscillator {
             fast_ema: Ema::new(fast_period)?,

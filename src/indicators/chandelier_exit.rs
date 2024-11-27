@@ -39,6 +39,9 @@ pub struct ChandelierExit {
 }
 
 impl ChandelierExit {
+    /// # Errors
+    ///
+    /// Will return `Err` if period or multipler is 0
     pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             atr: AverageTrueRange::new(period)?,
@@ -48,6 +51,7 @@ impl ChandelierExit {
         })
     }
 
+    #[must_use]
     pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }

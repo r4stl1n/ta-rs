@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 
 use crate::{lit, Close, Next, Reset, Volume};
@@ -29,7 +30,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// * [On Balance Volume, Wikipedia](https://en.wikipedia.org/wiki/On-balance_volume)
 /// * [On Balance Volume, stockcharts](https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
-/// 
+///
 
 #[doc(alias = "OBV")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -40,6 +41,7 @@ pub struct OnBalanceVolume {
 }
 
 impl OnBalanceVolume {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             obv: lit!(0.0),
@@ -52,11 +54,16 @@ impl<T: Close + Volume> Next<&T> for OnBalanceVolume {
     type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> rust_decimal::Decimal {
-        if input.close() > self.prev_close {
-            self.obv += input.volume();
-        } else if input.close() < self.prev_close {
-            self.obv -= input.volume();
+        match input.close().cmp(&self.prev_close) {
+            Ordering::Greater => {
+                self.obv += input.volume();
+            }
+            Ordering::Less => {
+                self.obv -= input.volume();
+            }
+            Ordering::Equal => {}
         }
+
         self.prev_close = input.close();
         self.obv
     }

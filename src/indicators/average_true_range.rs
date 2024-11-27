@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 /// # Parameters
 ///
 /// * _period_ - smoothing period of EMA (integer greater than 0)
-/// 
+///
 #[doc(alias = "ATR")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
@@ -35,6 +35,9 @@ pub struct AverageTrueRange {
 }
 
 impl AverageTrueRange {
+    /// # Errors
+    ///
+    /// Will return `Err` if period is 0
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             true_range: TrueRange::new(),

@@ -12,8 +12,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Parameters
 ///
-/// * _stochastic_period_ - number of periods for fast stochastic (integer greater than 0). Default is 14.
-/// * _ema_period_ - period for EMA (integer greater than 0). Default is 3.
+/// * _`stochastic_period`_ - number of periods for fast stochastic (integer greater than 0). Default is 14.
+/// * _`ema_period`_ - period for EMA (integer greater than 0). Default is 3.
 ///
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
@@ -23,6 +23,9 @@ pub struct SlowStochastic {
 }
 
 impl SlowStochastic {
+    /// # Errors
+    ///
+    /// Will return `Err` if any of the periods are 0
     pub fn new(stochastic_period: usize, ema_period: usize) -> Result<Self> {
         Ok(Self {
             fast_stochastic: FastStochastic::new(stochastic_period)?,
