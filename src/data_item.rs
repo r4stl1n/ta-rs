@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Candle {
-    time: DateTime<Utc>,
+    datetime: DateTime<Utc>,
     open: rust_decimal::Decimal,
     high: rust_decimal::Decimal,
     low: rust_decimal::Decimal,
@@ -21,6 +21,10 @@ impl Candle {
     #[must_use]
     pub fn builder() -> CandleBuilder {
         CandleBuilder::new()
+    }
+
+    pub fn datetime(&self) -> DateTime<Utc> {
+        self.datetime
     }
 }
 
@@ -112,7 +116,7 @@ impl CandleBuilder {
                 && volume >= lit!(0.0)
             {
                 let item = Candle {
-                    time,
+                    datetime: time,
                     open,
                     high,
                     low,
