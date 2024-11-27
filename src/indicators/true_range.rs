@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 /// extern crate ta;
 /// #[macro_use] extern crate assert_approx_eq;
 ///
-/// use ta::{Next, DataItem};
+/// use ta::{Next, Candle};
 /// use ta::indicators::TrueRange;
 ///
 /// fn main() {
@@ -38,7 +38,7 @@ use serde::{Deserialize, Serialize};
 ///     let mut indicator = TrueRange::new();
 ///
 ///     for (open, high, low, close, tr) in data {
-///         let di = DataItem::builder()
+///         let di = Candle::builder()
 ///             .high(high)
 ///             .low(low)
 ///             .close(close)

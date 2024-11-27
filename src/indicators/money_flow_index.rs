@@ -36,10 +36,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// ```
 /// use ta::indicators::MoneyFlowIndex;
-/// use ta::{Next, DataItem};
+/// use ta::{Next, Candle};
 ///
 /// let mut mfi = MoneyFlowIndex::new(3).unwrap();
-/// let di = DataItem::builder()
+/// let di = Candle::builder()
 ///             .high(3.0)
 ///             .low(1.0)
 ///             .close(2.0)

@@ -7,11 +7,11 @@ use ta::indicators::{
     PercentagePriceOscillator, RateOfChange, RelativeStrengthIndex, SimpleMovingAverage,
     SlowStochastic, StandardDeviation, TrueRange, WeightedMovingAverage,
 };
-use ta::{lit, DataItem, Next};
+use ta::{lit, Candle, Next};
 
 const ITEMS_COUNT: usize = 5_000;
 
-fn rand_data_item() -> DataItem {
+fn rand_data_item() -> Candle {
     let mut rng = rand::thread_rng();
 
     let low = rng.gen_range(lit!(0.0)..=lit!(500.0));
@@ -20,7 +20,7 @@ fn rand_data_item() -> DataItem {
     let close = rng.gen_range(low..=high);
     let volume = rng.gen_range(lit!(0.0)..=lit!(10_000.0));
 
-    DataItem::builder()
+    Candle::builder()
         .open(open)
         .high(high)
         .low(low)
@@ -35,7 +35,7 @@ macro_rules! bench_indicators {
         $(
             #[allow(non_snake_case)]
             fn $indicator(bench: &mut Bencher) {
-                let items: Vec<DataItem> = (0..ITEMS_COUNT).map( |_| rand_data_item() ).collect();
+                let items: Vec<Candle> = (0..ITEMS_COUNT).map( |_| rand_data_item() ).collect();
                 let mut indicator = $indicator::default();
 
                 bench.iter(|| {

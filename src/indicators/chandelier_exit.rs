@@ -28,11 +28,11 @@ use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
 ///
 /// ```
 /// use ta::indicators::ChandelierExit;
-/// use ta::{Next, DataItem};
+/// use ta::{Next, Candle};
 ///
-/// let value1 = DataItem::builder()
+/// let value1 = Candle::builder()
 /// .open(21.0).high(22.0).low(20.0).close(21.0).volume(1.0).build().unwrap();
-/// let value2 = DataItem::builder()
+/// let value2 = Candle::builder()
 /// .open(23.0).high(24.0).low(22.0).close(23.0).volume(1.0).build().unwrap();
 ///
 /// let mut ce = ChandelierExit::default();

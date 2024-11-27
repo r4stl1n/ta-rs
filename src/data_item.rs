@@ -11,10 +11,10 @@ use serde::{Deserialize, Serialize};
 /// # Example
 ///
 /// ```
-/// use ta::DataItem;
+/// use ta::Candle;
 /// use ta::{Open, High, Low, Close, Volume};
 ///
-/// let item = DataItem::builder()
+/// let item = Candle::builder()
 ///     .open(20.0)
 ///     .high(25.0)
 ///     .low(15.0)
@@ -32,7 +32,7 @@ use serde::{Deserialize, Serialize};
 ///
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq)]
-pub struct DataItem {
+pub struct Candle {
     time: NaiveDateTime,
     open: NumberType,
     high: NumberType,
@@ -41,44 +41,44 @@ pub struct DataItem {
     volume: NumberType,
 }
 
-impl DataItem {
-    pub fn builder() -> DataItemBuilder {
-        DataItemBuilder::new()
+impl Candle {
+    pub fn builder() -> CandleBuilder {
+        CandleBuilder::new()
     }
 }
 
-impl Open for DataItem {
+impl Open for Candle {
     fn open(&self) -> NumberType {
         self.open
     }
 }
 
-impl High for DataItem {
+impl High for Candle {
     fn high(&self) -> NumberType {
         self.high
     }
 }
 
-impl Low for DataItem {
+impl Low for Candle {
     fn low(&self) -> NumberType {
         self.low
     }
 }
 
-impl Close for DataItem {
+impl Close for Candle {
     fn close(&self) -> NumberType {
         self.close
     }
 }
 
-impl Volume for DataItem {
+impl Volume for Candle {
     fn volume(&self) -> NumberType {
         self.volume
     }
 }
 
 #[derive(Default)]
-pub struct DataItemBuilder {
+pub struct CandleBuilder {
     time: Option<NaiveDateTime>,
     open: Option<NumberType>,
     high: Option<NumberType>,
@@ -87,7 +87,7 @@ pub struct DataItemBuilder {
     volume: Option<NumberType>,
 }
 
-impl DataItemBuilder {
+impl CandleBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -117,7 +117,7 @@ impl DataItemBuilder {
         self
     }
 
-    pub fn build(self) -> Result<DataItem> {
+    pub fn build(self) -> Result<Candle> {
         if let (Some(time), Some(open), Some(high), Some(low), Some(close), Some(volume)) =
             (self.time, self.open, self.high, self.low, self.close, self.volume)
         {
@@ -129,7 +129,7 @@ impl DataItemBuilder {
                 && high >= close
                 && volume >= lit!(0.0)
             {
-                let item = DataItem {
+                let item = Candle {
                     time,
                     open,
                     high,
@@ -162,7 +162,7 @@ mod tests {
                 NumberType,
             ),
         ) {
-            let result = DataItem::builder()
+            let result = Candle::builder()
                 .open(open)
                 .high(high)
                 .low(low)
@@ -181,7 +181,7 @@ mod tests {
                 NumberType,
             ),
         ) {
-            let result = DataItem::builder()
+            let result = Candle::builder()
                 .open(open)
                 .high(high)
                 .low(low)

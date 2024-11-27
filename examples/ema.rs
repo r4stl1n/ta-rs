@@ -1,5 +1,5 @@
 use ta::indicators::ExponentialMovingAverage as Ema;
-use ta::DataItem;
+use ta::Candle;
 use ta::Next;
 
 #[cfg(feature = "decimal")]
@@ -14,7 +14,7 @@ fn main() {
     for record in reader.deserialize() {
         let (date, open, high, low, close, volume): (String, Num, Num, Num, Num, Num) =
             record.unwrap();
-        let dt = DataItem::builder()
+        let dt = Candle::builder()
             .open(open)
             .high(high)
             .low(low)
