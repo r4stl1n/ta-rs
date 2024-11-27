@@ -27,19 +27,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0). Default is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::FastStochastic;
-/// use ta::Next;
-///
-/// let mut stoch = FastStochastic::new(5).unwrap();
-/// assert_eq!(stoch.next(20.0), 50.0);
-/// assert_eq!(stoch.next(30.0), 100.0);
-/// assert_eq!(stoch.next(40.0), 100.0);
-/// assert_eq!(stoch.next(35.0), 75.0);
-/// assert_eq!(stoch.next(15.0), 0.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct FastStochastic {

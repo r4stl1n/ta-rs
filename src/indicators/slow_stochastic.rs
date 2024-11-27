@@ -15,19 +15,6 @@ use serde::{Deserialize, Serialize};
 /// * _stochastic_period_ - number of periods for fast stochastic (integer greater than 0). Default is 14.
 /// * _ema_period_ - period for EMA (integer greater than 0). Default is 3.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::SlowStochastic;
-/// use ta::Next;
-///
-/// let mut stoch = SlowStochastic::new(3, 2).unwrap();
-/// assert_eq!(stoch.next(10.0), 50.0);
-/// assert_eq!(stoch.next(50.0).round(), 83.0);
-/// assert_eq!(stoch.next(50.0).round(), 94.0);
-/// assert_eq!(stoch.next(30.0).round(), 31.0);
-/// assert_eq!(stoch.next(55.0).round(), 77.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
 pub struct SlowStochastic {

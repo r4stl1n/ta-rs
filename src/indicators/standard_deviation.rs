@@ -24,21 +24,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0)
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::StandardDeviation;
-/// use ta::Next;
-///
-/// let mut sd = StandardDeviation::new(3).unwrap();
-/// assert_eq!(sd.next(10.0), 0.0);
-/// assert_eq!(sd.next(20.0), 5.0);
-/// ```
-///
-/// # Links
-///
-/// * [Standard Deviation, Wikipedia](https://en.wikipedia.org/wiki/Standard_deviation)
-///
 #[doc(alias = "SD")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

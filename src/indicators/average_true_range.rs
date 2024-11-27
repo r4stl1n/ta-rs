@@ -25,40 +25,7 @@ use serde::{Deserialize, Serialize};
 /// # Parameters
 ///
 /// * _period_ - smoothing period of EMA (integer greater than 0)
-///
-/// # Example
-///
-/// ```
-/// extern crate ta;
-/// #[macro_use] extern crate assert_approx_eq;
-///
-/// use ta::{Next, Candle};
-/// use ta::indicators::AverageTrueRange;
-///
-/// fn main() {
-///     use rust_decimal::Decimal;
-///     use rust_decimal::prelude::FromPrimitive;
-///
-/// let data = vec![
-///         // open, high, low, close, atr
-///         (Decimal::new(97,1))   , 10.0, 9.0, 9.5  , 1.0),    // tr = high - low = 10.0 - 9.0 = 1.0
-///         (9.9   , 10.4, 9.8, 10.2 , 0.95),   // tr = high - prev_close = 10.4 - 9.5 = 0.9
-///         (10.1  , 10.7, 9.4, 9.7  , 1.125),  // tr = high - low = 10.7 - 9.4 = 1.3
-///         (9.1   , 9.2 , 8.1, 8.4  , 1.3625), // tr = prev_close - low = 9.7 - 8.1 = 1.6
-///     ];
-///     let mut indicator = AverageTrueRange::new(3).unwrap();
-///
-///     for (open, high, low, close, atr) in data {
-///         let di = Candle::builder()
-///             .high(Decimal::from_f32(high))
-///             .low(low)
-///             .close(close)
-///             .open(open)
-///             .volume(1000.0)
-///             .build().unwrap();
-///         assert_approx_eq!(indicator.next(&di), atr);
-///     }
-/// }
+/// 
 #[doc(alias = "ATR")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

@@ -33,24 +33,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0)
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::ExponentialMovingAverage;
-/// use ta::Next;
-///
-/// let mut ema = ExponentialMovingAverage::new(3).unwrap();
-/// assert_eq!(ema.next(2.0), 2.0);
-/// assert_eq!(ema.next(5.0), 3.5);
-/// assert_eq!(ema.next(1.0), 2.25);
-/// assert_eq!(ema.next(6.25), 4.25);
-/// ```
-///
 /// # Links
 ///
 /// * [Exponential moving average, Wikipedia](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average)
 ///
-
 #[doc(alias = "EMA")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

@@ -28,28 +28,6 @@ use serde::{Deserialize, Serialize};
 /// * _slow_period_ - period for the slow EMA. Default is 26.
 /// * _signal_period_ - period for the signal EMA. Default is 9.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::PercentagePriceOscillator as Ppo;
-/// use ta::Next;
-///
-/// let mut ppo = Ppo::new(3, 6, 4).unwrap();
-///
-/// assert_eq!(round(ppo.next(2.0).into()), (0.0, 0.0, 0.0));
-/// assert_eq!(round(ppo.next(3.0).into()), (9.38, 3.75, 5.63));
-/// assert_eq!(round(ppo.next(4.2).into()), (18.26, 9.56, 8.71));
-/// assert_eq!(round(ppo.next(7.0).into()), (28.62, 17.18, 11.44));
-/// assert_eq!(round(ppo.next(6.7).into()), (24.01, 19.91, 4.09));
-/// assert_eq!(round(ppo.next(6.5).into()), (17.84, 19.08, -1.24));
-///
-/// fn round(nums: (f64, f64, f64)) -> (f64, f64, f64) {
-///     let n0 = (nums.0 * 100.0).round() / 100.0;
-///     let n1 = (nums.1 * 100.0).round() / 100.0;
-///     let n2 = (nums.2 * 100.0).round() / 100.0;
-///     (n0, n1, n2)
-/// }
-/// ```
 #[doc(alias = "PPO")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

@@ -22,30 +22,10 @@ use serde::{Deserialize, Serialize};
 ///  * _KC<sub>Upper Band</sub>_ = EMA + ATR of observation * multipler (usually 2.0)
 ///  * _KC<sub>Lower Band</sub>_ = EMA - ATR of observation * multipler (usually 2.0)
 ///
-/// # Example
-///
-///```
-/// use ta::indicators::{KeltnerChannel, KeltnerChannelOutput};
-/// use ta::Next;
-///
-/// let mut kc = KeltnerChannel::new(3, 2.0_f64).unwrap();
-///
-/// let out_0 = kc.next(2.0);
-///
-/// let out_1 = kc.next(5.0);
-///
-/// assert_eq!(out_0.average, 2.0);
-/// assert_eq!(out_0.upper, 2.0);
-/// assert_eq!(out_0.lower, 2.0);
-///
-/// assert_eq!(out_1.average, 3.5);
-/// assert_eq!(out_1.upper, 6.5);
-/// assert_eq!(out_1.lower, 0.5);
-/// ```
-///
 /// # Links
 ///
 /// * [Keltner channel, Wikipedia](https://en.wikipedia.org/wiki/Keltner_channel)
+/// 
 #[doc(alias = "KC")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

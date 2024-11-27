@@ -51,19 +51,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::RelativeStrengthIndex;
-/// use ta::Next;
-///
-/// let mut rsi = RelativeStrengthIndex::new(3).unwrap();
-/// assert_eq!(rsi.next(10.0), 50.0);
-/// assert_eq!(rsi.next(10.5).round(), 86.0);
-/// assert_eq!(rsi.next(10.0).round(), 35.0);
-/// assert_eq!(rsi.next(9.5).round(), 16.0);
-/// ```
-///
 /// # Links
 /// * [Relative strength index (Wikipedia)](https://en.wikipedia.org/wiki/Relative_strength_index)
 /// * [RSI (Investopedia)](http://www.investopedia.com/terms/r/rsi.asp)

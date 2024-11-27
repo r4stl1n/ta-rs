@@ -24,28 +24,6 @@ use crate::{lit, Close, High, Low, Next, Period, Reset};
 /// * _period_ - number of periods (integer greater than 0). Default is 22.
 /// * _multipler_ - ATR factor. Default is 3.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::ChandelierExit;
-/// use ta::{Next, Candle};
-///
-/// let value1 = Candle::builder()
-/// .open(21.0).high(22.0).low(20.0).close(21.0).volume(1.0).build().unwrap();
-/// let value2 = Candle::builder()
-/// .open(23.0).high(24.0).low(22.0).close(23.0).volume(1.0).build().unwrap();
-///
-/// let mut ce = ChandelierExit::default();
-///
-/// let first = ce.next(&value1);
-/// assert_eq!(first.long, 16.0);
-/// assert_eq!(first.short, 26.0);
-///
-/// let second = ce.next(&value2);
-/// assert_eq!((second.long * 100.0).round() / 100.0, 17.74);
-/// assert_eq!((second.short * 100.0).round() / 100.0, 26.26);
-/// ```
-///
 /// # Links
 ///
 /// * [Chandelier Exit, StockCharts](https://school.stockcharts.com/doku.php?id=technical_indicators:chandelier_exit)

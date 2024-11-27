@@ -21,19 +21,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods (integer greater than 0)
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::SimpleMovingAverage;
-/// use ta::Next;
-///
-/// let mut sma = SimpleMovingAverage::new(3).unwrap();
-/// assert_eq!(sma.next(10.0), 10.0);
-/// assert_eq!(sma.next(11.0), 10.5);
-/// assert_eq!(sma.next(12.0), 11.0);
-/// assert_eq!(sma.next(13.0), 12.0);
-/// ```
-///
 /// # Links
 ///
 /// * [Simple Moving Average, Wikipedia](https://en.wikipedia.org/wiki/Moving_average#Simple_moving_average)

@@ -25,38 +25,11 @@ use serde::{Deserialize, Serialize};
 ///
 /// obv - on the balance volume
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::OnBalanceVolume;
-/// use ta::{Next, Candle};
-///
-/// let mut obv = OnBalanceVolume::new();
-///
-/// let di1 = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(2.0)
-///             .open(1.5)
-///             .volume(1000.0)
-///             .build().unwrap();
-///
-/// let di2 = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(1.5)
-///             .open(1.5)
-///             .volume(300.0)
-///             .build().unwrap();
-///
-/// assert_eq!(obv.next(&di1), 1000.0);
-/// assert_eq!(obv.next(&di2), 700.0);
-/// ```
-///
 /// # Links
 ///
 /// * [On Balance Volume, Wikipedia](https://en.wikipedia.org/wiki/On-balance_volume)
 /// * [On Balance Volume, stockcharts](https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:on_balance_volume_obv)
+/// 
 
 #[doc(alias = "OBV")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

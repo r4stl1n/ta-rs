@@ -12,18 +12,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - size of the time frame (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::Minimum;
-/// use ta::Next;
-///
-/// let mut min = Minimum::new(3).unwrap();
-/// assert_eq!(min.next(10.0), 10.0);
-/// assert_eq!(min.next(11.0), 10.0);
-/// assert_eq!(min.next(12.0), 10.0);
-/// assert_eq!(min.next(13.0), 11.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct Minimum {

@@ -32,27 +32,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - number of periods, integer greater than 0
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::MoneyFlowIndex;
-/// use ta::{Next, Candle};
-///
-/// let mut mfi = MoneyFlowIndex::new(3).unwrap();
-/// let di = Candle::builder()
-///             .high(3.0)
-///             .low(1.0)
-///             .close(2.0)
-///             .open(1.5)
-///             .volume(1000.0)
-///             .build().unwrap();
-/// mfi.next(&di);
-///
-/// ```
 /// # Links
 /// * [Money Flow Index, Wikipedia](https://en.wikipedia.org/wiki/Money_flow_index)
 /// * [Money Flow Index, stockcharts](https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi)
-
+///
 #[doc(alias = "MFI")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]

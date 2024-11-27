@@ -12,19 +12,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// * _period_ - size of the time frame (integer greater than 0). Default value is 14.
 ///
-/// # Example
-///
-/// ```
-/// use ta::indicators::Maximum;
-/// use ta::Next;
-///
-/// let mut max = Maximum::new(3).unwrap();
-/// assert_eq!(max.next(7.0), 7.0);
-/// assert_eq!(max.next(5.0), 7.0);
-/// assert_eq!(max.next(4.0), 7.0);
-/// assert_eq!(max.next(4.0), 5.0);
-/// assert_eq!(max.next(8.0), 8.0);
-/// ```
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct Maximum {

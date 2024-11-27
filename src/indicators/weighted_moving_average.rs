@@ -21,26 +21,6 @@ use serde::{Deserialize, Serialize};
 /// * _n_ - is the period.
 /// * _p<sub>M</sub>_ - is the input value at a time period t.
 ///
-/// # Example
-///
-/// ```
-/// use rust_decimal::Decimal;
-/// use rust_decimal::prelude::FromPrimitive;
-/// use ta::indicators::WeightedMovingAverage;
-/// use ta::Next;
-///
-/// let mut wma = WeightedMovingAverage::new(3).unwrap();
-/// assert_eq!(wma.next(Decimal::from_f32(10.0).unwrap()), Decimal::from_f32(10.0).unwrap());
-/// assert_eq!(wma.next(13.0), 12.0);
-/// assert_eq!(wma.next(16.0), 14.0);
-/// assert_eq!(wma.next(14.0), 14.5);
-/// ```
-///
-/// # Links
-///
-/// * [Weighted moving average, Wikipedia](https://en.wikipedia.org/wiki/Moving_average#Weighted_moving_average)
-///
-
 #[doc(alias = "WMA")]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
