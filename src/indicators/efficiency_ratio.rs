@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -36,7 +36,7 @@ pub struct EfficiencyRatio {
     period: usize,
     index: usize,
     count: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl EfficiencyRatio {
@@ -59,10 +59,10 @@ impl Period for EfficiencyRatio {
     }
 }
 
-impl Next<NumberType> for EfficiencyRatio {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for EfficiencyRatio {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> NumberType {
+    fn next(&mut self, input: rust_decimal::Decimal) -> rust_decimal::Decimal {
         let first = if self.count >= self.period {
             self.deque[self.index]
         } else {
@@ -93,9 +93,9 @@ impl Next<NumberType> for EfficiencyRatio {
 }
 
 impl<T: Close> Next<&T> for EfficiencyRatio {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
         self.next(input.close())
     }
 }

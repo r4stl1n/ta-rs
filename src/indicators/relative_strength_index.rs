@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::ExponentialMovingAverage as Ema;
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -75,7 +75,7 @@ pub struct RelativeStrengthIndex {
     period: usize,
     up_ema_indicator: Ema,
     down_ema_indicator: Ema,
-    prev_val: NumberType,
+    prev_val: rust_decimal::Decimal,
     is_new: bool,
 }
 
@@ -97,10 +97,10 @@ impl Period for RelativeStrengthIndex {
     }
 }
 
-impl Next<NumberType> for RelativeStrengthIndex {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for RelativeStrengthIndex {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let mut up = lit!(0.0);
         let mut down = lit!(0.0);
 
@@ -123,7 +123,7 @@ impl Next<NumberType> for RelativeStrengthIndex {
 }
 
 impl<T: Close> Next<&T> for RelativeStrengthIndex {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())

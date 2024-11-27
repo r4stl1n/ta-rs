@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +45,7 @@ pub struct RateOfChange {
     period: usize,
     index: usize,
     count: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl RateOfChange {
@@ -68,10 +68,10 @@ impl Period for RateOfChange {
     }
 }
 
-impl Next<NumberType> for RateOfChange {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for RateOfChange {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> NumberType {
+    fn next(&mut self, input: rust_decimal::Decimal) -> rust_decimal::Decimal {
         let previous = if self.count > self.period {
             self.deque[self.index]
         } else {
@@ -95,9 +95,9 @@ impl Next<NumberType> for RateOfChange {
 }
 
 impl<T: Close> Next<&T> for RateOfChange {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
         self.next(input.close())
     }
 }
@@ -152,7 +152,7 @@ mod tests {
 
     #[test]
     fn test_next_bar() {
-        fn bar(close: NumberType) -> Bar {
+        fn bar(close: rust_decimal::Decimal) -> Bar {
             Bar::new().close(close)
         }
 

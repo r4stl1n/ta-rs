@@ -1,7 +1,6 @@
 use std::fmt;
-
 use crate::errors::{Result, TaError};
-use crate::{int, lit, Close, Next, NumberType, Period, Reset};
+use crate::{int, lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -57,8 +56,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 pub struct ExponentialMovingAverage {
     period: usize,
-    k: NumberType,
-    current: NumberType,
+    k: rust_decimal::Decimal,
+    current: rust_decimal::Decimal,
     is_new: bool,
 }
 
@@ -69,7 +68,7 @@ impl ExponentialMovingAverage {
             _ => Ok(Self {
                 period,
                 k: lit!(2.0) / int!(period + 1),
-                current: NumberType::default(),
+                current: rust_decimal::Decimal::default(),
                 is_new: true,
             }),
         }
@@ -82,10 +81,10 @@ impl Period for ExponentialMovingAverage {
     }
 }
 
-impl Next<NumberType> for ExponentialMovingAverage {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for ExponentialMovingAverage {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         if self.is_new {
             self.is_new = false;
             self.current = input;
@@ -97,7 +96,7 @@ impl Next<NumberType> for ExponentialMovingAverage {
 }
 
 impl<T: Close> Next<&T> for ExponentialMovingAverage {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())
@@ -106,7 +105,7 @@ impl<T: Close> Next<&T> for ExponentialMovingAverage {
 
 impl Reset for ExponentialMovingAverage {
     fn reset(&mut self) {
-        self.current = NumberType::default();
+        self.current = rust_decimal::Decimal::default();
         self.is_new = true;
     }
 }

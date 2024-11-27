@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::StandardDeviation as Sd;
-use crate::{lit, Close, Next, NumberType, Period, Reset};
+use crate::{lit, Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -50,19 +50,19 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 pub struct BollingerBands {
     period: usize,
-    multiplier: NumberType,
+    multiplier: rust_decimal::Decimal,
     sd: Sd,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BollingerBandsOutput {
-    pub average: NumberType,
-    pub upper: NumberType,
-    pub lower: NumberType,
+    pub average: rust_decimal::Decimal,
+    pub upper: rust_decimal::Decimal,
+    pub lower: rust_decimal::Decimal,
 }
 
 impl BollingerBands {
-    pub fn new(period: usize, multiplier: NumberType) -> Result<Self> {
+    pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             period,
             multiplier,
@@ -70,7 +70,7 @@ impl BollingerBands {
         })
     }
 
-    pub fn multiplier(&self) -> NumberType {
+    pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }
 }
@@ -81,10 +81,10 @@ impl Period for BollingerBands {
     }
 }
 
-impl Next<NumberType> for BollingerBands {
+impl Next<rust_decimal::Decimal> for BollingerBands {
     type Output = BollingerBandsOutput;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let sd = self.sd.next(input);
         let mean = self.sd.mean();
 

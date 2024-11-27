@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::{Result, TaError};
 use crate::helpers::NEG_INFINITY;
-use crate::{High, Next, NumberType, Period, Reset};
+use crate::{High, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -31,7 +31,7 @@ pub struct Maximum {
     period: usize,
     max_index: usize,
     cur_index: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl Maximum {
@@ -68,10 +68,10 @@ impl Period for Maximum {
     }
 }
 
-impl Next<NumberType> for Maximum {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for Maximum {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.deque[self.cur_index] = input;
 
         if input > self.deque[self.max_index] {
@@ -91,7 +91,7 @@ impl Next<NumberType> for Maximum {
 }
 
 impl<T: High> Next<&T> for Maximum {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.high())
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(high: NumberType) -> Bar {
+        fn bar(high: rust_decimal::Decimal) -> Bar {
             Bar::new().high(high)
         }
 

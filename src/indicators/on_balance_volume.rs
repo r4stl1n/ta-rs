@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{lit, Close, Next, NumberType, Reset, Volume};
+use crate::{lit, Close, Next, Reset, Volume};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -62,8 +62,8 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct OnBalanceVolume {
-    obv: NumberType,
-    prev_close: NumberType,
+    obv: rust_decimal::Decimal,
+    prev_close: rust_decimal::Decimal,
 }
 
 impl OnBalanceVolume {
@@ -76,9 +76,9 @@ impl OnBalanceVolume {
 }
 
 impl<T: Close + Volume> Next<&T> for OnBalanceVolume {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
         if input.close() > self.prev_close {
             self.obv += input.volume();
         } else if input.close() < self.prev_close {

@@ -4,7 +4,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::{Result, TaError};
-use crate::{int, lit, Close, Next, NumberType, Period, Reset};
+use crate::{int, lit, Close, Next, Period, Reset};
 
 /// Mean Absolute Deviation (MAD)
 ///
@@ -33,8 +33,8 @@ pub struct MeanAbsoluteDeviation {
     period: usize,
     index: usize,
     count: usize,
-    sum: NumberType,
-    deque: Box<[NumberType]>,
+    sum: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl MeanAbsoluteDeviation {
@@ -58,10 +58,10 @@ impl Period for MeanAbsoluteDeviation {
     }
 }
 
-impl Next<NumberType> for MeanAbsoluteDeviation {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for MeanAbsoluteDeviation {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.sum = if self.count < self.period {
             self.count += 1;
             self.sum + input
@@ -87,7 +87,7 @@ impl Next<NumberType> for MeanAbsoluteDeviation {
 }
 
 impl<T: Close> Next<&T> for MeanAbsoluteDeviation {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())

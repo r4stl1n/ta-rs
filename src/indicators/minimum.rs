@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::{Result, TaError};
 use crate::helpers::INFINITY;
-use crate::{Low, Next, NumberType, Period, Reset};
+use crate::{Low, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -30,7 +30,7 @@ pub struct Minimum {
     period: usize,
     min_index: usize,
     cur_index: usize,
-    deque: Box<[NumberType]>,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl Minimum {
@@ -67,10 +67,10 @@ impl Period for Minimum {
     }
 }
 
-impl Next<NumberType> for Minimum {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for Minimum {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.deque[self.cur_index] = input;
 
         if input < self.deque[self.min_index] {
@@ -90,7 +90,7 @@ impl Next<NumberType> for Minimum {
 }
 
 impl<T: Low> Next<&T> for Minimum {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.low())
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(low: NumberType) -> Bar {
+        fn bar(low: rust_decimal::Decimal) -> Bar {
             Bar::new().low(low)
         }
 

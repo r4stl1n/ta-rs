@@ -54,7 +54,6 @@
 //!
 #[macro_use]
 mod helpers;
-pub(crate) use helpers::NumberType;
 
 #[cfg(test)]
 #[macro_use]

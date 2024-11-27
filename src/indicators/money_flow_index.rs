@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset, Volume};
+use crate::{lit, Close, High, Low, Next, Period, Reset, Volume};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -60,10 +60,10 @@ pub struct MoneyFlowIndex {
     period: usize,
     index: usize,
     count: usize,
-    previous_typical_price: NumberType,
-    total_positive_money_flow: NumberType,
-    total_negative_money_flow: NumberType,
-    deque: Box<[NumberType]>,
+    previous_typical_price: rust_decimal::Decimal,
+    total_positive_money_flow: rust_decimal::Decimal,
+    total_negative_money_flow: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl MoneyFlowIndex {
@@ -90,9 +90,9 @@ impl Period for MoneyFlowIndex {
 }
 
 impl<T: High + Low + Close + Volume> Next<&T> for MoneyFlowIndex {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: &T) -> NumberType {
+    fn next(&mut self, input: &T) -> rust_decimal::Decimal {
         let tp = (input.close() + input.high() + input.low()) / lit!(3.0);
 
         self.index = if self.index + 1 < self.period {

@@ -1,6 +1,3 @@
-use crate::NumberType;
-
-// Indicator traits
 
 /// Resets an indicator to the initial state.
 pub trait Reset {
@@ -28,25 +25,25 @@ pub trait Next<T> {
 
 /// Open price of a particular period.
 pub trait Open {
-    fn open(&self) -> NumberType;
+    fn open(&self) -> rust_decimal::Decimal;
 }
 
 /// Close price of a particular period.
 pub trait Close {
-    fn close(&self) -> NumberType;
+    fn close(&self) -> rust_decimal::Decimal;
 }
 
 /// Lowest price of a particular period.
 pub trait Low {
-    fn low(&self) -> NumberType;
+    fn low(&self) -> rust_decimal::Decimal;
 }
 
 /// Highest price of a particular period.
 pub trait High {
-    fn high(&self) -> NumberType;
+    fn high(&self) -> rust_decimal::Decimal;
 }
 
 /// Trading volume of a particular trading period.
 pub trait Volume {
-    fn volume(&self) -> NumberType;
+    fn volume(&self) -> rust_decimal::Decimal;
 }

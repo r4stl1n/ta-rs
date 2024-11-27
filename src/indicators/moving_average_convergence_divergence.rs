@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::ExponentialMovingAverage as Ema;
-use crate::{Close, Next, NumberType, Period, Reset};
+use crate::{Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -71,21 +71,21 @@ impl MovingAverageConvergenceDivergence {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MovingAverageConvergenceDivergenceOutput {
-    pub macd: NumberType,
-    pub signal: NumberType,
-    pub histogram: NumberType,
+    pub macd: rust_decimal::Decimal,
+    pub signal: rust_decimal::Decimal,
+    pub histogram: rust_decimal::Decimal,
 }
 
-impl From<MovingAverageConvergenceDivergenceOutput> for (NumberType, NumberType, NumberType) {
+impl From<MovingAverageConvergenceDivergenceOutput> for (rust_decimal::Decimal,rust_decimal::Decimal,rust_decimal::Decimal) {
     fn from(mo: MovingAverageConvergenceDivergenceOutput) -> Self {
         (mo.macd, mo.signal, mo.histogram)
     }
 }
 
-impl Next<NumberType> for MovingAverageConvergenceDivergence {
+impl Next<rust_decimal::Decimal> for MovingAverageConvergenceDivergence {
     type Output = MovingAverageConvergenceDivergenceOutput;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let fast_val = self.fast_ema.next(input);
         let slow_val = self.slow_ema.next(input);
 
@@ -144,7 +144,7 @@ mod tests {
 
     test_indicator!(Macd);
 
-    fn round(nums: (NumberType, NumberType, NumberType)) -> (NumberType, NumberType, NumberType) {
+    fn round(nums: (rust_decimal::Decimal,rust_decimal::Decimal,rust_decimal::Decimal)) -> (rust_decimal::Decimal,rust_decimal::Decimal,rust_decimal::Decimal) {
         let n0 = (nums.0 * lit!(100.0)).round() / lit!(100.0);
         let n1 = (nums.1 * lit!(100.0)).round() / lit!(100.0);
         let n2 = (nums.2 * lit!(100.0)).round() / lit!(100.0);

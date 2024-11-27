@@ -1,8 +1,7 @@
 use std::fmt;
 
 use crate::errors::{Result, TaError};
-use crate::{int, lit, Close, Next, NumberType, Period, Reset};
-#[cfg(feature = "decimal")]
+use crate::{int, lit, Close, Next, Period, Reset};
 use rust_decimal::MathematicalOps;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -47,9 +46,9 @@ pub struct StandardDeviation {
     period: usize,
     index: usize,
     count: usize,
-    m: NumberType,
-    m2: NumberType,
-    deque: Box<[NumberType]>,
+    m: rust_decimal::Decimal,
+    m2: rust_decimal::Decimal,
+    deque: Box<[rust_decimal::Decimal]>,
 }
 
 impl StandardDeviation {
@@ -67,7 +66,7 @@ impl StandardDeviation {
         }
     }
 
-    pub(super) fn mean(&self) -> NumberType {
+    pub(super) fn mean(&self) -> rust_decimal::Decimal {
         self.m
     }
 }
@@ -78,10 +77,10 @@ impl Period for StandardDeviation {
     }
 }
 
-impl Next<NumberType> for StandardDeviation {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for StandardDeviation {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let old_val = self.deque[self.index];
         self.deque[self.index] = input;
 
@@ -108,9 +107,6 @@ impl Next<NumberType> for StandardDeviation {
             self.m2 = lit!(0.0);
         }
 
-        #[cfg(not(feature = "decimal"))]
-        return (self.m2 / int!(self.count)).sqrt();
-        #[cfg(feature = "decimal")]
         return (self.m2 / int!(self.count))
             .sqrt()
             .expect("Invalid (probably negative) number sent.");
@@ -118,7 +114,7 @@ impl Next<NumberType> for StandardDeviation {
 }
 
 impl<T: Close> Next<&T> for StandardDeviation {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.next(input.close())
@@ -187,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_next_with_bars() {
-        fn bar(close: NumberType) -> Bar {
+        fn bar(close: rust_decimal::Decimal) -> Bar {
             Bar::new().close(close)
         }
 

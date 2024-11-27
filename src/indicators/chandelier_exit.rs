@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::errors::Result;
 use crate::indicators::{AverageTrueRange, Maximum, Minimum};
-use crate::{lit, Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{lit, Close, High, Low, Next, Period, Reset};
 
 /// Chandelier Exit (CE).
 ///
@@ -57,11 +57,11 @@ pub struct ChandelierExit {
     atr: AverageTrueRange,
     min: Minimum,
     max: Maximum,
-    multiplier: NumberType,
+    multiplier: rust_decimal::Decimal,
 }
 
 impl ChandelierExit {
-    pub fn new(period: usize, multiplier: NumberType) -> Result<Self> {
+    pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             atr: AverageTrueRange::new(period)?,
             min: Minimum::new(period)?,
@@ -70,18 +70,18 @@ impl ChandelierExit {
         })
     }
 
-    pub fn multiplier(&self) -> NumberType {
+    pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ChandelierExitOutput {
-    pub long: NumberType,
-    pub short: NumberType,
+    pub long: rust_decimal::Decimal,
+    pub short: rust_decimal::Decimal,
 }
 
-impl From<ChandelierExitOutput> for (NumberType, NumberType) {
+impl From<ChandelierExitOutput> for (rust_decimal::Decimal,rust_decimal::Decimal) {
     fn from(ce: ChandelierExitOutput) -> Self {
         (ce.long, ce.short)
     }
@@ -136,7 +136,7 @@ mod tests {
 
     type Ce = ChandelierExit;
 
-    fn round(nums: (NumberType, NumberType)) -> (NumberType, NumberType) {
+    fn round(nums: (rust_decimal::Decimal,rust_decimal::Decimal)) -> (rust_decimal::Decimal,rust_decimal::Decimal) {
         let n0 = (nums.0 * lit!(100.0)).round() / lit!(100.0);
         let n1 = (nums.1 * lit!(100.0)).round() / lit!(100.0);
         (n0, n1)

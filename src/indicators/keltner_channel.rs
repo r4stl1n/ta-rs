@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::{AverageTrueRange, ExponentialMovingAverage};
-use crate::{int, lit, Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{int, lit, Close, High, Low, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -51,20 +51,20 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 pub struct KeltnerChannel {
     period: usize,
-    multiplier: NumberType,
+    multiplier: rust_decimal::Decimal,
     atr: AverageTrueRange,
     ema: ExponentialMovingAverage,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct KeltnerChannelOutput {
-    pub average: NumberType,
-    pub upper: NumberType,
-    pub lower: NumberType,
+    pub average: rust_decimal::Decimal,
+    pub upper: rust_decimal::Decimal,
+    pub lower: rust_decimal::Decimal,
 }
 
 impl KeltnerChannel {
-    pub fn new(period: usize, multiplier: NumberType) -> Result<Self> {
+    pub fn new(period: usize, multiplier: rust_decimal::Decimal) -> Result<Self> {
         Ok(Self {
             period,
             multiplier,
@@ -73,7 +73,7 @@ impl KeltnerChannel {
         })
     }
 
-    pub fn multiplier(&self) -> NumberType {
+    pub fn multiplier(&self) -> rust_decimal::Decimal {
         self.multiplier
     }
 }
@@ -84,10 +84,10 @@ impl Period for KeltnerChannel {
     }
 }
 
-impl Next<NumberType> for KeltnerChannel {
+impl Next<rust_decimal::Decimal> for KeltnerChannel {
     type Output = KeltnerChannelOutput;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         let atr = self.atr.next(input);
         let average = self.ema.next(input);
 

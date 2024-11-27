@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::errors::Result;
 use crate::indicators::{ExponentialMovingAverage, TrueRange};
-use crate::{Close, High, Low, Next, NumberType, Period, Reset};
+use crate::{Close, High, Low, Next, Period, Reset};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -36,9 +36,12 @@ use serde::{Deserialize, Serialize};
 /// use ta::indicators::AverageTrueRange;
 ///
 /// fn main() {
-///     let data = vec![
+///     use rust_decimal::Decimal;
+///     use rust_decimal::prelude::FromPrimitive;
+///
+/// let data = vec![
 ///         // open, high, low, close, atr
-///         (9.7   , 10.0, 9.0, 9.5  , 1.0),    // tr = high - low = 10.0 - 9.0 = 1.0
+///         (Decimal::new(97,1))   , 10.0, 9.0, 9.5  , 1.0),    // tr = high - low = 10.0 - 9.0 = 1.0
 ///         (9.9   , 10.4, 9.8, 10.2 , 0.95),   // tr = high - prev_close = 10.4 - 9.5 = 0.9
 ///         (10.1  , 10.7, 9.4, 9.7  , 1.125),  // tr = high - low = 10.7 - 9.4 = 1.3
 ///         (9.1   , 9.2 , 8.1, 8.4  , 1.3625), // tr = prev_close - low = 9.7 - 8.1 = 1.6
@@ -47,7 +50,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     for (open, high, low, close, atr) in data {
 ///         let di = Candle::builder()
-///             .high(high)
+///             .high(Decimal::from_f32(high))
 ///             .low(low)
 ///             .close(close)
 ///             .open(open)
@@ -79,16 +82,16 @@ impl Period for AverageTrueRange {
     }
 }
 
-impl Next<NumberType> for AverageTrueRange {
-    type Output = NumberType;
+impl Next<rust_decimal::Decimal> for AverageTrueRange {
+    type Output = rust_decimal::Decimal;
 
-    fn next(&mut self, input: NumberType) -> Self::Output {
+    fn next(&mut self, input: rust_decimal::Decimal) -> Self::Output {
         self.ema.next(self.true_range.next(input))
     }
 }
 
 impl<T: High + Low + Close> Next<&T> for AverageTrueRange {
-    type Output = NumberType;
+    type Output = rust_decimal::Decimal;
 
     fn next(&mut self, input: &T) -> Self::Output {
         self.ema.next(self.true_range.next(input))
