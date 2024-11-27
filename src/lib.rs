@@ -53,3 +53,4 @@ pub use crate::traits::*;
 
 mod data_item;
 pub use crate::data_item::Candle;
+pub use crate::data_item::CandleBuilder;
