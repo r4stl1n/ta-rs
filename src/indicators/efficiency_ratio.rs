@@ -76,7 +76,11 @@ impl Next<rust_decimal::Decimal> for EfficiencyRatio {
             previous = *n;
         }
 
-        (first - input).abs() / volatility
+        if volatility == lit!(0.0) {
+            lit!(1.0)
+        } else {
+            (first - input).abs() / volatility
+        }
     }
 }
 
