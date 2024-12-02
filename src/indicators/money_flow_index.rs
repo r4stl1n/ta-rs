@@ -117,14 +117,17 @@ impl<T: High + Low + Close + Volume> Next<&T> for MoneyFlowIndex {
             Ordering::Equal => {
                 self.deque[self.index] = lit!(0.0);
             }
-
         }
 
         self.previous_typical_price = tp;
 
-        self.total_positive_money_flow
-            / (self.total_positive_money_flow + self.total_negative_money_flow)
-            * lit!(100.0)
+        // Handle the case where both flows are zero
+        let total_flow = self.total_positive_money_flow + self.total_negative_money_flow;
+        if total_flow == lit!(0.0) {
+            lit!(50.0) // Return neutral value when there's no flow
+        } else {
+            self.total_positive_money_flow / total_flow * lit!(100.0)
+        }
     }
 }
 
